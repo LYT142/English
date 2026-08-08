@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+sqlalchemy
+asyncpg
+psycopg2-binary
+python-dotenv
+redis
+pymilvus
+langchain
+langchain-community
+langchain-openai
+pydantic
+python-multipart
+passlib[bcrypt]
+python-jose
+alembic
+pydantic-settings
