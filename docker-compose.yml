@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: english_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: english
+      POSTGRES_PASSWORD: english_password
+      POSTGRES_DB: english_lab
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7
+    container_name: english_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    container_name: milvus_etcd
+    command: etcd -advertise-client-urls=http://0.0.0.0:2379 -listen-client-urls=http://0.0.0.0:2379
+    volumes:
+      - milvus_etcd:/etcd
+
+  minio:
+    image: minio/minio
+    container_name: milvus_minio
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+  milvus:
+    image: milvusdb/milvus:v2.4.0
+    container_name: milvus
+    depends_on:
+      - etcd
+      - minio
+    ports:
+      - "19530:19530"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    command: ["milvus", "run", "standalone"]
+
+  backend:
+    build: ./backend
+    container_name: english_backend
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - milvus
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://english:english_password@postgres:5432/english_lab
+      REDIS_URL: redis://redis:6379
+      MILVUS_HOST: milvus
+    volumes:
+      - ./backend:/app
+
+volumes:
+  postgres_data:
+  redis_data:
+  milvus_etcd:
+  milvus_data:
+  minio_data:
