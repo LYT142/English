@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+      - name: Syntax check
+        run: python -m compileall backend
+      - name: API smoke test
+        run: |
+          cd backend
+          python - <<'PY'
+          from fastapi.testclient import TestClient
+          from main import app
+
+          client = TestClient(app)
+          assert client.get('/health').status_code == 200
+          exercises = client.get('/api/exercises').json()
+          assert len(exercises) >= 4
+          response = client.post('/api/evaluate', json={'exercise_id': 1, 'answer': exercises[0]['reference_answer']})
+          assert response.status_code == 200
+          assert response.json()['score'] >= 80
+          PY

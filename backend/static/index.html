@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Academic English Training Platform</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">AI 学术英语训练平台</p>
+        <h1>用即时反馈提升论文写作、翻译与学术表达。</h1>
+        <p class="lead">选择练习，提交你的英文版本，系统会根据参考答案、关键词覆盖和学术语体给出评分与修改建议。</p>
+      </section>
+      <section class="workspace">
+        <aside>
+          <h2>训练任务</h2>
+          <div id="exerciseList" class="exercise-list"></div>
+        </aside>
+        <section class="card trainer">
+          <div class="tag" id="skillTag">Loading</div>
+          <h2 id="exerciseTitle">正在加载练习...</h2>
+          <p id="exercisePrompt"></p>
+          <ul id="hints"></ul>
+          <label for="answer">你的答案</label>
+          <textarea id="answer" rows="6" placeholder="在这里输入你的学术英文改写..."></textarea>
+          <button id="submitBtn">获取 AI 风格反馈</button>
+          <div id="result" class="result hidden"></div>
+        </section>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
